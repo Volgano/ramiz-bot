@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ramiz's Bot | AI Assistant</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { 
+            background: #0f0f0f; 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+            color: #e0e0e0; 
+        }
+        .chat-card { 
+            width: 100%; 
+            max-width: 400px; 
+            height: 600px; 
+            background: #181818; 
+            border-radius: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.7); 
+            border: 1px solid #2a2a2a; 
+            overflow: hidden;
+        }
+        .chat-header { 
+            background: #222; 
+            padding: 20px; 
+            text-align: center; 
+            border-bottom: 1px solid #333; 
+        }
+        .status-dot {
+            height: 8px;
+            width: 8px;
+            background-color: #4caf50;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+        .chat-box { 
+            flex: 1; 
+            padding: 20px; 
+            overflow-y: auto; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 12px; 
+            background: linear-gradient(to bottom, #181818, #121212);
+        }
+        .msg { 
+            padding: 12px 16px; 
+            border-radius: 15px; 
+            max-width: 85%; 
+            line-height: 1.5; 
+            font-size: 0.95rem; 
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .user { 
+            background: #007bff; 
+            color: white; 
+            align-self: flex-end; 
+            border-bottom-right-radius: 2px; 
+        }
+        .bot { 
+            background: #2d2d2d; 
+            color: #efefef; 
+            align-self: flex-start; 
+            border-bottom-left-radius: 2px; 
+            border: 1px solid #3d3d3d;
+        }
+        .input-area { 
+            padding: 20px; 
+            display: flex; 
+            gap: 10px; 
+            background: #1e1e1e; 
+        }
+        input { 
+            flex: 1; 
+            padding: 12px 15px; 
+            border-radius: 10px; 
+            border: 1px solid #333; 
+            background: #252525; 
+            color: white; 
+            outline: none; 
+            transition: border 0.3s;
+        }
+        input:focus { border-color: #007bff; }
+        button { 
+            padding: 10px 18px; 
+            border: none; 
+            border-radius: 10px; 
+            background: #007bff; 
+            color: white; 
+            cursor: pointer; 
+            font-weight: 600; 
+            transition: background 0.3s;
+        }
+        button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+
+    <div class="chat-card">
+        <div class="chat-header">
+            <h2 style="margin:0; font-size: 1.1rem; letter-spacing: 1px;">RAMIZ'S BOT</h2>
+            <div style="font-size: 0.7rem; color: #888; margin-top: 5px;">
+                <span class="status-dot"></span> LIVE SYSTEM
+            </div>
+        </div>
+        <div id="chat-box" class="chat-box">
+            <div class="msg bot">Yo! I'm Ramiz's AI. Before we start, what's your name?</div>
+        </div>
+        <div class="input-area">
+            <input type="text" id="user-input" placeholder="Type name or message..." autocomplete="off">
+            <button onclick="sendMessage()">SEND</button>
+        </div>
+    </div>
+
+    <script>
+        // YOUR REPLIT URL
+        const REPLIT_URL = "https://86bf1656-17c7-464b-90c6-dd4293ec627e-00-veis8amdgxgk.sisko.replit.dev"; 
+
+        async function sendMessage() {
+            const input = document.getElementById('user-input');
+            const chatBox = document.getElementById('chat-box');
+            const message = input.value.trim();
+            
+            if (!message) return;
+
+            // 1. Display User Message
+            chatBox.innerHTML += `<div class="msg user">${message}</div>`;
+            input.value = '';
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            try {
+                // 2. Send to Replit Backend
+                const response = await fetch(`${REPLIT_URL}/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: message })
+                });
+
+                if (!response.ok) throw new Error("Server Error");
+
+                const data = await response.json();
+                
+                // 3. Display Bot Response
+                chatBox.innerHTML += `<div class="msg bot">${data.response}</div>`;
+            } catch (error) {
+                console.error(error);
+                chatBox.innerHTML += `<div class="msg bot" style="border-color: #ff4444;">⚠️ Error: Brain is sleeping. Go to Replit and hit RUN!</div>`;
+            }
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        // Allow 'Enter' key to send message
+        document.getElementById('user-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') sendMessage();
+        });
+    </script>
+</body>
+</html>
