@@ -156,6 +156,15 @@
                 console.error(error);
                 chatBox.innerHTML += `<div class="msg bot" style="border-color: #ff4444;">⚠️ Error: Brain is sleeping. Go to Replit and hit RUN!</div>`;
             }
+            // Disable button when clicked
+sendButton.disabled = true;
+sendButton.innerText = "Thinking...";
+
+const response = await fetch('your-replit-url/chat', { ... });
+
+// Re-enable after response
+sendButton.disabled = false;
+sendButton.innerText = "Send";
             chatBox.scrollTop = chatBox.scrollHeight;
         }
 
