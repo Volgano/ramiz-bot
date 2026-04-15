@@ -60,7 +60,6 @@
             animation: fadeIn 0.3s ease;
         }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
         .user { 
             background: #007bff; 
             color: white; 
@@ -102,6 +101,7 @@
             transition: background 0.3s;
         }
         button:hover { background: #0056b3; }
+        button:disabled { background: #444; cursor: not-allowed; }
     </style>
 </head>
 <body>
@@ -118,17 +118,18 @@
         </div>
         <div class="input-area">
             <input type="text" id="user-input" placeholder="Type name or message..." autocomplete="off">
-            <button onclick="sendMessage()">SEND</button>
+            <button id="send-btn" onclick="sendMessage()">SEND</button>
         </div>
     </div>
 
     <script>
-        // YOUR REPLIT URL
-        const REPLIT_URL = "https://86bf1656-17c7-464b-90c6-dd4293ec627e-00-veis8amdgxgk.sisko.replit.dev/"; 
+        // ✅ No trailing slash
+        const REPLIT_URL = "https://86bf1656-17c7-464b-90c6-dd4293ec627e-00-veis8amdgxgk.sisko.replit.dev";
 
         async function sendMessage() {
             const input = document.getElementById('user-input');
             const chatBox = document.getElementById('chat-box');
+            const sendBtn = document.getElementById('send-btn');
             const message = input.value.trim();
             
             if (!message) return;
@@ -138,8 +139,12 @@
             input.value = '';
             chatBox.scrollTop = chatBox.scrollHeight;
 
+            // 2. Disable button while waiting
+            sendBtn.disabled = true;
+            sendBtn.innerText = "Thinking...";
+
             try {
-                // 2. Send to Replit Backend
+                // 3. Send to Replit Backend ✅ clean URL, no double slash
                 const response = await fetch(`${REPLIT_URL}/chat`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -150,25 +155,20 @@
 
                 const data = await response.json();
                 
-                // 3. Display Bot Response
+                // 4. Display Bot Response
                 chatBox.innerHTML += `<div class="msg bot">${data.response}</div>`;
+
             } catch (error) {
                 console.error(error);
                 chatBox.innerHTML += `<div class="msg bot" style="border-color: #ff4444;">⚠️ Error: Brain is sleeping. Go to Replit and hit RUN!</div>`;
             }
-            // Disable button when clicked
-sendButton.disabled = true;
-sendButton.innerText = "Thinking...";
 
-const response = await fetch('your-replit-url/chat', { ... });
-
-// Re-enable after response
-sendButton.disabled = false;
-sendButton.innerText = "Send";
+            // 5. Re-enable button
+            sendBtn.disabled = false;
+            sendBtn.innerText = "SEND";
             chatBox.scrollTop = chatBox.scrollHeight;
         }
 
-        // Allow 'Enter' key to send message
         document.getElementById('user-input').addEventListener('keypress', function (e) {
             if (e.key === 'Enter') sendMessage();
         });
